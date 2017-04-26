@@ -66,7 +66,7 @@ def refresh_data(_start_ ='2015-08-01',_end_ = ct._TODAY_):
                 
                 
 def read_data():      
-    dat = pd.read_csv('d:/data/code.csv',index_col=0,encoding='gbk')
+    dat = pd.read_csv('code.csv',index_col=0,encoding='gbk')
     dic = {}
     
     i = 0
@@ -74,7 +74,7 @@ def read_data():
         i+= 1
         print i,code
         try:
-            df = pd.read_csv('d:/data/%s.csv'%code,index_col=0,parse_dates=[0],encoding='gbk')  #parse_dates直接转换数据类型，不用再重新狗再累   
+            df = pd.read_csv('%s.csv'%code,index_col=0,parse_dates=[0],encoding='gbk')  #parse_dates直接转换数据类型，不用再重新狗再累
             if df is not None:
                 dic[code] = df
         except IOError: 
