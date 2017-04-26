@@ -19,7 +19,7 @@ from pandas import DataFrame
 def save_data():
     dat = ts.get_industry_classified()
     dat = dat.drop_duplicates('code')  
-    dat.to_csv('d:/data/code.csv',encoding='gbk')
+    dat.to_csv('code.csv',encoding='gbk')
     inuse = []
     
     i = 0
@@ -29,19 +29,19 @@ def save_data():
         try:
             _data_ = ts.get_hist_data(code,end=ct._MIDDLE_)  #默认取3年，code为str，start无效的,start 和end若当天有数据则全都取
             if _data_ is not None:
-                _data_.to_csv('d:/data/%s.csv'%code,encoding='gbk')
+                _data_.to_csv('%s.csv'%code,encoding='gbk')
                 if _data_.index[0] in ct._start_range and _data_.index[-1] in ct._end_range:                          #筛选一次代码，使用头尾都包含的代码
                     inuse.append(code)
         except IOError: 
             pass    #不行的话还是continue           
     #print len(inuse)
     _df_inuse = DataFrame(inuse,columns={'code'})
-    _df_inuse.to_csv('d:/data/code_inuse.csv',encoding='gbk')
+    _df_inuse.to_csv('code_inuse.csv',encoding='gbk')
 
 #从网络中更新数据,code 必须为str，dat中的为int
 def refresh_data(_start_ ='2015-08-01',_end_ = ct._TODAY_):
-    dat = pd.read_csv('d:/data/code.csv',index_col=0,encoding='gbk')
-    inuse = pd.read_csv('d:/data/code_inuse.csv',index_col=0,parse_dates=[0],encoding='gbk')
+    dat = pd.read_csv('code.csv',index_col=0,encoding='gbk')
+    inuse = pd.read_csv('code_inuse.csv',index_col=0,parse_dates=[0],encoding='gbk')
     new_inuse = []
     
     i=0
@@ -50,7 +50,7 @@ def refresh_data(_start_ ='2015-08-01',_end_ = ct._TODAY_):
         print i,code
         try:
             _data_ = ts.get_hist_data(str(code),start=_start_,end=_end_)  #默认取3年，start 8-1包括
-            filename = 'd:/data/%s.csv'%code
+            filename = '%s.csv'%code
             if _data_ is not None and _data_.size != 0:
                 if os.path.exists(filename):
                     _data_.to_csv(filename, mode='a', header=None,encoding='gbk')
@@ -62,7 +62,7 @@ def refresh_data(_start_ ='2015-08-01',_end_ = ct._TODAY_):
             pass    #不行的话还是continue           
     #print len(inuse)
     _df_inuse = DataFrame(new_inuse,columns={'code'})
-    _df_inuse.to_csv('d:/data/code_new_inuse.csv',encoding='gbk')
+    _df_inuse.to_csv('code_new_inuse.csv',encoding='gbk')
                 
                 
 def read_data():      
@@ -220,6 +220,7 @@ def bigVolume(scope=15,v_times=5,t_percent=20):
              pass    #不行的话还是continue
 #refresh_data()              
 #change_type_to_yahoo()
-bigVolume()
+#bigVolume()
 #_data_ = pd.read_csv('d:/data/600848.csv',index_col=0,parse_dates=[0],encoding='gbk')   #默认取3年，code为str，start无效的,start 和end若当天有数据则全都取
 #_data_.plot() 
+save_data()
