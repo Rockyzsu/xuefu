@@ -75,7 +75,7 @@ def read_data():
         print i,code
         try:
             df = pd.read_csv('%s.csv'%code,index_col=0,parse_dates=[0],encoding='gbk')  #parse_dates直接转换数据类型，不用再重新狗再累
-            if df is not None:
+            if df is not None or len(df)!=0:
                 dic[code] = df
         except IOError: 
             pass    #不行的话还是continue
@@ -84,7 +84,7 @@ def read_data():
 #仅适用数据头尾完备的code    
 def get_universe():
     try:
-        dat = pd.read_csv('d:/data/code_inuse.csv',index_col=0,parse_dates=[0],encoding='gbk')
+        dat = pd.read_csv('code_inuse.csv',index_col=0,parse_dates=[0],encoding='gbk')
     except Exception: 
         dat = ts.get_industry_classified()
     dat = dat.drop_duplicates('code')                                                   #去除重复code
@@ -139,14 +139,14 @@ def plt_macd(df,da):
 
 
 def temp2():
-    dat = pd.read_csv('d:/data/code.csv',index_col=0,encoding='gbk')
+    dat = pd.read_csv('code.csv',index_col=0,encoding='gbk')
     inuse = []   
     i = 0
     for code in dat['code'].values:
         i+= 1
         print i,code
         try:
-            _data_ = pd.read_csv('d:/data/%s.csv'%code,index_col=0,parse_dates=[0],encoding='gbk')   #默认取3年，code为str，start无效的,start 和end若当天有数据则全都取
+            _data_ = pd.read_csv('%s.csv'%code,index_col=0,parse_dates=[0],encoding='gbk')   #默认取3年，code为str，start无效的,start 和end若当天有数据则全都取
             if _data_ is not None:
                 if _data_.index[0] in ct._start_range and _data_.index[-1] in ct._end_range:                          #筛选一次代码，使用头尾都包含的代码
                     inuse.append(code)
@@ -154,10 +154,10 @@ def temp2():
             pass    #不行的话还是continue           
     #print len(inuse)
     _df_inuse = DataFrame(inuse,columns={'code'})
-    _df_inuse.to_csv('d:/data/code_inuse.csv',encoding='gbk')
+    _df_inuse.to_csv('code_inuse.csv',encoding='gbk')
 def temp():
-    dat = pd.read_csv('d:/data/code.csv',index_col=0,encoding='gbk')
-    inuse = pd.read_csv('d:/data/code_inuse.csv',index_col=0,parse_dates=[0],encoding='gbk')
+    dat = pd.read_csv('code.csv',index_col=0,encoding='gbk')
+    inuse = pd.read_csv('code_inuse.csv',index_col=0,parse_dates=[0],encoding='gbk')
     new_inuse = []
         
     i=0
@@ -165,7 +165,7 @@ def temp():
             i+= 1
             #print i,code
             try:
-                _data_ = pd.read_csv('d:/data/%s.csv'%code,index_col=0,parse_dates=[0],encoding='gbk')  #默认取3年，start 8-1包括
+                _data_ = pd.read_csv('%s.csv'%code,index_col=0,parse_dates=[0],encoding='gbk')  #默认取3年，start 8-1包括
                 if code in inuse['code'].values and _data_.index[0] in pd.date_range(start=ct._START_,periods=7) and _data_.index[-1] in pd.date_range(end=ct._TODAY_,periods=7):                          #筛选一次代码，使用头尾都包含的代码
                    new_inuse.append(code)
                    
@@ -173,22 +173,22 @@ def temp():
                 pass    #不行的话还是continue           
         #print len(inuse)
     _df_inuse = DataFrame(new_inuse,columns={'code'})
-    _df_inuse.to_csv('d:/data/code_new_inuse.csv',encoding='gbk')
+    _df_inuse.to_csv('code_new_inuse.csv',encoding='gbk')
 
 #temp2() 
 #重命名索引名，列名，将调整收盘价置为none
 def change_type_to_yahoo():
-    inuse = pd.read_csv('d:/data/code_inuse.csv',index_col=0,parse_dates=[0],encoding='gbk')               
+    inuse = pd.read_csv('code_inuse.csv',index_col=0,parse_dates=[0],encoding='gbk')
     inuse.to_csv('d:/data2/code_inuse.csv',encoding='gbk')
     re_columns ={'high':'High','low':'Low','open':'Open','close':'Close','volume':'Volume','price_change':'Adj Close'}  
     i=0
     for code in inuse['code'].values:
         i+= 1
         print i,code
-        _data_ = pd.read_csv('d:/data/%s.csv'%code,index_col=0,parse_dates=[0],encoding='gbk')  #默认取3年，start 8-1包括
+        _data_ = pd.read_csv('%s.csv'%code,index_col=0,parse_dates=[0],encoding='gbk')  #默认取3年，start 8-1包括
         _data_=_data_.rename(columns=re_columns)
         _data_.index.name = 'Date'
-        _data_.to_csv('d:/data2/%s.csv'%code,columns=['Open','High','Low','Close','Volume','Adj Close'],date_format="%Y-%m-%d",encoding='gbk')
+        _data_.to_csv('%s.csv'%code,columns=['Open','High','Low','Close','Volume','Adj Close'],date_format="%Y-%m-%d",encoding='gbk')
         
 def get_beta(values1, values2):
     # http://statsmodels.sourceforge.net/stable/regression.html
@@ -202,14 +202,14 @@ def get_beta(values1, values2):
 #选择下跌行情中天量成交和高换手率，后期加入小盘股等指标，scope 为近15日
 #scope =15,看最近15天的情况，v_times 为当日成交量为前一日的倍数，t_percent为当日换手率
 def bigVolume(scope=15,v_times=5,t_percent=20):
-    inuse = pd.read_csv('d:/data/code_inuse.csv',index_col=0,parse_dates=[0],encoding='gbk')
+    inuse = pd.read_csv('code_inuse.csv',index_col=0,parse_dates=[0],encoding='gbk')
     rs_list = []
     i=0
     for code in inuse['code'].values:
         try:
-             _data_ = pd.read_csv('d:/data/%s.csv'%code,index_col=0,parse_dates=[0],encoding='gbk')   #默认取3年，code为str，start无效的,start 和end若当天有数据则全都取
+             _data_ = pd.read_csv('%s.csv'%code,index_col=0,parse_dates=[0],encoding='gbk')   #默认取3年，code为str，start无效的,start 和end若当天有数据则全都取
              dd = (_data_['volume']/_data_['volume'].shift(1)>v_times) & (_data_['turnover']>t_percent)
-             dd = dd & (_data_['close']<22)
+             dd = dd & (_data_['close']<22) #22块以下？
              if dd[-scope:].any():
                  i+=1
                  if i<5:
