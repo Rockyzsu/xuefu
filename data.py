@@ -28,7 +28,7 @@ def save_data():
         print i,code
         try:
             _data_ = ts.get_hist_data(code,end=ct._MIDDLE_)  #默认取3年，code为str，start无效的,start 和end若当天有数据则全都取
-            if _data_ is not None:
+            if _data_ is not None or len(_data_)!=0:
                 _data_.to_csv('%s.csv'%code,encoding='gbk')
                 if _data_.index[0] in ct._start_range and _data_.index[-1] in ct._end_range:                          #筛选一次代码，使用头尾都包含的代码
                     inuse.append(code)
@@ -93,7 +93,7 @@ def get_universe():
 #    
 def get_data(code):
     try:
-        dat = pd.read_csv('d:/data/%s.csv'%code,index_col=0,parse_dates=[0],encoding='gbk')  #parse_dates直接转换数据类型，不用再重新狗再累 
+        dat = pd.read_csv('%s.csv'%code,index_col=0,parse_dates=[0],encoding='gbk')  #parse_dates直接转换数据类型，不用再重新狗再累
     except Exception:
         dat = None
     return dat
